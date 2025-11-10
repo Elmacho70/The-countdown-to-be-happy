@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Días Laborables hasta Fin de Año - México</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #1a2a6c;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+        }
+        
+        .counter {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .days-count {
+            font-size: 5rem;
+            font-weight: bold;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .days-label {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .date-info {
+            font-size: 1.2rem;
+            margin: 15px 0;
+        }
+        
+        .holidays-section {
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        .holidays-title {
+            color: #1a2a6c;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .holidays-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .holiday-item {
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .holiday-date {
+            background-color: #1a2a6c;
+            color: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .holiday-day {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .holiday-month {
+            font-size: 0.8rem;
+        }
+        
+        .holiday-name {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #1a2a6c, #b21f1f);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .days-count {
+                font-size: 3.5rem;
+            }
+            
+            .holidays-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Días Laborables hasta Fin de Año</h1>
+        <p class="subtitle">Contador de días de lunes a viernes excluyendo días festivos en México</p>
+        
+        <div class="counter">
+            <div class="days-count" id="daysCount">0</div>
+            <div class="days-label">días laborables restantes</div>
+            <div class="date-info">Hoy es <span id="currentDate"></span></div>
+            <div class="date-info">Fecha objetivo: 31 de diciembre de <span id="targetYear"></span></div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress" id="progressBar"></div>
+        </div>
+        <div class="progress-text">
+            <span>Inicio del año</span>
+            <span>Fin de año</span>
+        </div>
+        
+        <div class="holidays-section">
+            <h2 class="holidays-title">Días Festivos Restantes</h2>
+            <div class="holidays-list" id="holidaysList">
+                <!-- Los días festivos se cargarán aquí con JavaScript -->
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Este contador excluye fines de semana (sábados y domingos) y días festivos oficiales en México.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Obtener elementos del DOM
+            const daysCountElement = document.getElementById('daysCount');
+            const currentDateElement = document.getElementById('currentDate');
+            const targetYearElement = document.getElementById('targetYear');
+            const progressBarElement = document.getElementById('progressBar');
+            const holidaysListElement = document.getElementById('holidaysList');
+            
+            // Fecha actual y fecha objetivo (31 de diciembre del año actual)
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const targetDate = new Date(currentYear, 11, 31); // Diciembre es el mes 11
+            
+            // Mostrar fechas
+            currentDateElement.textContent = formatDate(today);
+            targetYearElement.textContent = currentYear;
+            
+            // Días festivos oficiales en México (fechas fijas)
+            const fixedHolidays = [
+                { name: "Año Nuevo", date: new Date(currentYear, 0, 1) },
+                { name: "Día de la Constitución", date: new Date(currentYear, 1, 5) }, // Primer lunes de febrero
+                { name: "Natalicio de Benito Juárez", date: new Date(currentYear, 2, 21) }, // Tercer lunes de marzo
+                { name: "Día del Trabajo", date: new Date(currentYear, 4, 1) },
+                { name: "Día de la Independencia", date: new Date(currentYear, 8, 16) }, // Se celebra el 16
+                { name: "Revolución Mexicana", date: new Date(currentYear, 10, 20) }, // Tercer lunes de noviembre
+                { name: "Navidad", date: new Date(currentYear, 11, 25) }
+            ];
+            
+            // Ajustar días festivos que se mueven al lunes más cercano (Ley Federal del Trabajo)
+            adjustHolidaysToMonday(fixedHolidays);
+            
+            // Calcular días laborables
+            const workingDays = calculateWorkingDays(today, targetDate, fixedHolidays);
+            
+            // Mostrar resultado
+            daysCountElement.textContent = workingDays;
+            
+            // Calcular y mostrar progreso del año
+            const yearStart = new Date(currentYear, 0, 1);
+            const totalYearDays = Math.ceil((targetDate - yearStart) / (1000 * 60 * 60 * 24)) + 1;
+            const daysPassed = Math.ceil((today - yearStart) / (1000 * 60 * 60 * 24));
+            const progressPercentage = (daysPassed / totalYearDays) * 100;
+            progressBarElement.style.width = `${progressPercentage}%`;
+            
+            // Mostrar días festivos restantes
+            displayRemainingHolidays(fixedHolidays, today);
+            
+            // Función para calcular días laborables
+            function calculateWorkingDays(startDate, endDate, holidays) {
+                let count = 0;
+                const current = new Date(startDate);
+                
+                // Asegurarnos de no contar el día actual si ya pasó la hora laboral
+                if (current.getHours() >= 18) {
+                    current.setDate(current.getDate() + 1);
+                }
+                
+                current.setHours(0, 0, 0, 0);
+                const end = new Date(endDate);
+                end.setHours(0, 0, 0, 0);
+                
+                while (current <= end) {
+                    const dayOfWeek = current.getDay();
+                    // Si es día laborable (lunes a viernes)
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                        // Verificar si no es día festivo
+                        let isHoliday = false;
+                        for (const holiday of holidays) {
+                            if (isSameDate(current, holiday.date)) {
+                                isHoliday = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!isHoliday) {
+                            count++;
+                        }
+                    }
+                    
+                    current.setDate(current.getDate() + 1);
+                }
+                
+                return count;
+            }
+            
+            // Función para ajustar días festivos al lunes más cercano
+            function adjustHolidaysToMonday(holidays) {
+                holidays.forEach(holiday => {
+                    const dayOfWeek = holiday.date.getDay();
+                    // Si el día festivo cae en domingo, se mueve al lunes siguiente
+                    if (dayOfWeek === 0) {
+                        holiday.date.setDate(holiday.date.getDate() + 1);
+                    }
+                    // Si cae entre martes y sábado, se mueve al lunes anterior
+                    else if (dayOfWeek > 1) {
+                        holiday.date.setDate(holiday.date.getDate() - (dayOfWeek - 1));
+                    }
+                });
+            }
+            
+            // Función para mostrar días festivos restantes
+            function displayRemainingHolidays(holidays, today) {
+                const remainingHolidays = holidays.filter(holiday => 
+                    holiday.date >= today && holiday.date <= targetDate
+                );
+                
+                if (remainingHolidays.length === 0) {
+                    holidaysListElement.innerHTML = '<p>No hay más días festivos este año.</p>';
+                    return;
+                }
+                
+                // Ordenar por fecha
+                remainingHolidays.sort((a, b) => a.date - b.date);
+                
+                // Crear elementos para cada día festivo
+                remainingHolidays.forEach(holiday => {
+                    const holidayElement = document.createElement('div');
+                    holidayElement.className = 'holiday-item';
+                    
+                    const holidayDateElement = document.createElement('div');
+                    holidayDateElement.className = 'holiday-date';
+                    holidayDateElement.innerHTML = `
+                        <div class="holiday-day">${holiday.date.getDate()}</div>
+                        <div class="holiday-month">${getMonthName(holiday.date.getMonth())}</div>
+                    `;
+                    
+                    const holidayNameElement = document.createElement('div');
+                    holidayNameElement.className = 'holiday-name';
+                    holidayNameElement.textContent = holiday.name;
+                    
+                    holidayElement.appendChild(holidayDateElement);
+                    holidayElement.appendChild(holidayNameElement);
+                    
+                    holidaysListElement.appendChild(holidayElement);
+                });
+            }
+            
+            // Función auxiliar para formatear fecha
+            function formatDate(date) {
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                return date.toLocaleDateString('es-MX', options);
+            }
+            
+            // Función auxiliar para obtener nombre del mes
+            function getMonthName(month) {
+                const months = [
+                    'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+                    'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
+                ];
+                return months[month];
+            }
+            
+            // Función auxiliar para comparar si dos fechas son iguales (ignorando hora)
+            function isSameDate(date1, date2) {
+                return date1.getFullYear() === date2.getFullYear() &&
+                       date1.getMonth() === date2.getMonth() &&
+                       date1.getDate() === date2.getDate();
+            }
+        });
+    </script>
+</body>
+</html>
